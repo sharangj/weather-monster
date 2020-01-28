@@ -13,6 +13,8 @@ func Init() *gin.Engine {
 
 	r.GET("/ping", ping.Status)
 	r.POST("/cities", city.Create)
+	r.PATCH("/cities/:id", city.Update)
+	r.DELETE("/cities/:id", city.Delete)
 
 	return r
 }

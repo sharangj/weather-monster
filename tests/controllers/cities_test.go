@@ -3,6 +3,7 @@ package controllers_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -87,32 +88,186 @@ var _ = Describe("Cities", func() {
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
 			Expect(response["error"]).ToNot(BeNil())
 		})
+
+		It("does not create a city when wrong params are passed", func() {
+			router := server.Init()
+			var response map[string]interface{}
+
+			requestBody, err := json.Marshal(map[string]interface{}{
+				"name": "New York",
+			})
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("POST", "/cities", bytes.NewBuffer(requestBody))
+			req.Header.Add("Content-Type", "application/json")
+			router.ServeHTTP(w, req)
+
+			err = json.Unmarshal([]byte(w.Body.String()), &response)
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
+			Expect(response["error"]).ToNot(BeNil())
+		})
 	})
 
-	It("does not create a city when wrong params are passed", func() {
-		router := server.Init()
-		var response map[string]interface{}
+	Describe("PATCH", func() {
+		It("updates a city when the right params are passed to it", func() {
+			router := server.Init()
+			var response map[string]interface{}
 
-		requestBody, err := json.Marshal(map[string]interface{}{
-			"name": "New York",
+			//Create the city before the api call is made
+			db := db.Connect()
+			city := models.City{Name: "New York", Latitude: 42, Longitude: 12}
+			db.Create(&city)
+
+			requestBody, err := json.Marshal(map[string]interface{}{
+				"latitude":  52,
+				"longitude": 13,
+			})
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("PATCH", fmt.Sprintf("/cities/%d", city.ID), bytes.NewBuffer(requestBody))
+			req.Header.Add("Content-Type", "application/json")
+			router.ServeHTTP(w, req)
+
+			err = json.Unmarshal([]byte(w.Body.String()), &response)
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			Expect(w.Code).To(Equal(http.StatusOK))
+			Expect(response["name"]).To(Equal(city.Name))
+			Expect(response["latitude"]).To(Equal(float64(52)))
+			Expect(response["longitude"]).To(Equal(float64(13)))
 		})
 
-		if err != nil {
-			log.Fatalln(err)
-		}
+		It("updates a city when the only name is passed", func() {
+			router := server.Init()
+			var response map[string]interface{}
 
-		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/cities", bytes.NewBuffer(requestBody))
-		req.Header.Add("Content-Type", "application/json")
-		router.ServeHTTP(w, req)
+			//Create the city before the api call is made
+			db := db.Connect()
+			city := models.City{Name: "New York", Latitude: 42, Longitude: 12}
+			db.Create(&city)
 
-		err = json.Unmarshal([]byte(w.Body.String()), &response)
+			requestBody, err := json.Marshal(map[string]interface{}{
+				"name": "London",
+			})
 
-		if err != nil {
-			log.Fatalln(err)
-		}
+			if err != nil {
+				log.Fatalln(err)
+			}
 
-		Expect(w.Code).To(Equal(http.StatusBadRequest))
-		Expect(response["error"]).ToNot(BeNil())
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("PATCH", fmt.Sprintf("/cities/%d", city.ID), bytes.NewBuffer(requestBody))
+			req.Header.Add("Content-Type", "application/json")
+			router.ServeHTTP(w, req)
+
+			err = json.Unmarshal([]byte(w.Body.String()), &response)
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			Expect(w.Code).To(Equal(http.StatusOK))
+			Expect(response["name"]).To(Equal("London"))
+			Expect(response["latitude"]).To(Equal(float64(42)))
+			Expect(response["longitude"]).To(Equal(float64(12)))
+		})
+
+		It("does not update a city when the wrong id is passed", func() {
+			router := server.Init()
+			var response map[string]interface{}
+
+			//Create the city before the api call is made
+			db := db.Connect()
+			city := models.City{Name: "New York", Latitude: 42, Longitude: 12}
+			db.Create(&city)
+
+			requestBody, err := json.Marshal(map[string]interface{}{
+				"latitude":  52,
+				"longitude": 13,
+			})
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("PATCH", fmt.Sprintf("/cities/%d", city.ID+1), bytes.NewBuffer(requestBody))
+			req.Header.Add("Content-Type", "application/json")
+			router.ServeHTTP(w, req)
+
+			err = json.Unmarshal([]byte(w.Body.String()), &response)
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			Expect(w.Code).To(Equal(http.StatusNotFound))
+			Expect(response["error"]).To(Equal("City with this Id is not found"))
+		})
+	})
+
+	Describe("DELETE", func() {
+		It("deletes the city when an id is passed", func() {
+			router := server.Init()
+			var response map[string]interface{}
+
+			//Create the city before the api call is made
+			db := db.Connect()
+			city := models.City{Name: "New York", Latitude: 42, Longitude: 12}
+			db.Create(&city)
+
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("DELETE", fmt.Sprintf("/cities/%d", city.ID), nil)
+			router.ServeHTTP(w, req)
+
+			err := json.Unmarshal([]byte(w.Body.String()), &response)
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			Expect(w.Code).To(Equal(http.StatusOK))
+			Expect(response["name"]).To(Equal(city.Name))
+			Expect(response["latitude"]).To(Equal(float64(city.Latitude)))
+			Expect(response["longitude"]).To(Equal(float64(city.Longitude)))
+		})
+
+		It("does not delete a city when the wrong id is passed", func() {
+			router := server.Init()
+			var response map[string]interface{}
+
+			//Create the city before the api call is made
+			db := db.Connect()
+			city := models.City{Name: "New York", Latitude: 42, Longitude: 12}
+			db.Create(&city)
+
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("DELETE", fmt.Sprintf("/cities/%d", city.ID+1), nil)
+			router.ServeHTTP(w, req)
+
+			err := json.Unmarshal([]byte(w.Body.String()), &response)
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			Expect(w.Code).To(Equal(http.StatusNotFound))
+			Expect(response["error"]).To(Equal("City with this Id is not found"))
+		})
 	})
 })

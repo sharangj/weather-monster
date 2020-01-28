@@ -1,6 +1,7 @@
 package controllers_test
 
 import (
+	"io/ioutil"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,7 @@ import (
 func TestControllers(t *testing.T) {
 	config.Init("test")
 	gin.SetMode(gin.TestMode)
+	gin.DefaultWriter = ioutil.Discard
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Controllers Tests")
 }

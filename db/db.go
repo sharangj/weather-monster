@@ -15,5 +15,6 @@ func Connect() *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
+	db.LogMode(false) // Set to true for debugging
 	return db
 }
