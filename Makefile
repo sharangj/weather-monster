@@ -6,3 +6,6 @@ migrate-dev-db:
 
 migrate-test-db:
 	migrate -path ./db/migrations/ -database postgres://localhost:5432/weather_monster_test?sslmode=disable up
+
+test:
+	make migrate-test-db && go test ./tests/controllers/ -v

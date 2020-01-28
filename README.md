@@ -2,6 +2,12 @@
 
 An app to forecast weather of a city
 
+## Running tests
+
+- Run `make test` to run all the tests
+- Run only controller tests with `go test ./test/controllers/ -v`
+- Make sure you run test migrations using `make migrate-test-db`
+
 ## Running migrations
 
 - Run `make migrate-dev-db` for dev db and Run `make migrate-test-db` before running tests.
