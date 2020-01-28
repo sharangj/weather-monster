@@ -1,0 +1,3 @@
+ALTER TABLE cities
+ALTER COLUMN updated_at SET NOT NULL,
+ALTER COLUMN deleted_at SET NOT NULL;
