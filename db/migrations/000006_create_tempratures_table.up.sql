@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS temperatures(
+  id SERIAL PRIMARY KEY,
+  city_id INTEGER REFERENCES cities (id) NOT NULL,
+  max FLOAT NOT NULL,
+  min FLOAT NOT NULL,
+  created_at TIMESTAMP NOT NULL
+);
