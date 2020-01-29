@@ -1,0 +1,16 @@
+#!/bin/bash
+
+ENV=$1
+
+if [ "$#" -lt "1" ];then
+    echo "usage: $0 ENV"
+    exit 1
+fi
+
+if [ $ENV == "test" ]; then
+  FILE_PATH=tests/config/test.yaml
+else
+  FILE_PATH=config/$ENV.yaml
+fi
+
+migrate -path ./db/migrations/ -database $(cat $FILE_PATH | ruby -ryaml -e "print YAML.load(STDIN.read)['dbString']") up

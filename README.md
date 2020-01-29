@@ -1,6 +1,6 @@
 # Weather Monster
 
-An app to forecast weather of a city
+An app to forecast weather of a city.
 
 ## Running tests
 
