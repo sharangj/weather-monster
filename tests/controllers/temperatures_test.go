@@ -57,6 +57,7 @@ var _ = Describe("Temperatures", func() {
 			Expect(response["city_id"]).To(Equal(float64(city.ID)))
 			Expect(response["max"]).To(Equal(float64(30)))
 			Expect(response["min"]).To(Equal(float64(25)))
+			Expect(response["created_at"]).ToNot(BeNil())
 		})
 
 		It("does not create a temperature when max is less than min", func() {

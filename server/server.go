@@ -11,6 +11,7 @@ func Init() *gin.Engine {
 	ping := new(controllers.PingController)
 	city := new(controllers.CitiesController)
 	temperature := new(controllers.TemperaturesController)
+	forecasts := new(controllers.ForecastsController)
 
 	r.GET("/ping", ping.Status)
 	r.POST("/cities", city.Create)
@@ -18,6 +19,8 @@ func Init() *gin.Engine {
 	r.DELETE("/cities/:id", city.Delete)
 
 	r.POST("/temperatures", temperature.Create)
+
+	r.GET("/forecasts/:city_id", forecasts.Get)
 
 	return r
 }
