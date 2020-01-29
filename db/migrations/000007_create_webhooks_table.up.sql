@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS webhooks(
+  id SERIAL PRIMARY KEY,
+  city_id INTEGER REFERENCES cities (id) NOT NULL,
+  callback_url VARCHAR (100) NOT NULL
+);

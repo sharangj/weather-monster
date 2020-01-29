@@ -41,7 +41,7 @@ func (h TemperaturesController) Create(c *gin.Context) {
 	result := db.First(&city)
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"code":  http.StatusBadRequest,
+			"code":  http.StatusNotFound,
 			"error": "The city was not found",
 		})
 		return
