@@ -1,0 +1,1 @@
+DROP INDEX idx_temperature_created_at;

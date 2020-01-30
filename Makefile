@@ -8,7 +8,7 @@ migrate-test-db:
 	bin/db-migrate test
 
 test:
-	make migrate-test-db && go test ./tests/controllers/ -v
+	make migrate-test-db && go test ./tests/controllers/ -v && go test ./tests/models/ -v
 
 run:
 	make migrate-dev-db && go build && ./weather_monster

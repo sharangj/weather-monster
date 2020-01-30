@@ -1,0 +1,16 @@
+version: "2"
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+
+  api:
+    build: .
+    ports:
+      - "6060:8080"
+    depends_on:
+      - db
+    links:
+      - db
