@@ -13,6 +13,9 @@ An app to forecast weather of a city.
 - Create the db by running `make create-db`.
 - Add the database string to `config/development.yaml`.
 - Run `make run` to run the migrations, build the app and run the server.
+- Create test db using `psql postgres -c "create database weather_monster_test;"`.
+- Update the db string in `tests/config/test.yaml`.
+- Run `make test` to run all the tests.
 
 ## Running with docker
 
